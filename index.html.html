@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 關西 6 日旅行控制台 🇯🇵</title>
+
+<style>
+:root{
+  --nav:#17202a; --nav2:#22303d; --blue:#3b82f6; --blue2:#dbeafe;
+  --bg:#eef2f6; --card:#fff; --text:#18212b; --muted:#64748b;
+  --line:#e5e7eb; --green:#16a34a; --orange:#f59e0b; --red:#ef4444;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif;color:var(--text);background:var(--bg)}
+body{display:flex;overflow:hidden}
+
+/* 左側日期 */
+.sidebar{width:245px;background:linear-gradient(180deg,var(--nav),#111827);color:#fff;display:flex;flex-direction:column;flex-shrink:0}
+.brand{padding:24px 20px 18px;border-bottom:1px solid #344250}
+.brand h1{font-size:19px;margin:0 0 5px}
+.brand p{font-size:12px;color:#aeb9c6;margin:0}
+.days{padding:12px 10px;overflow:auto}
+.day-btn{width:100%;border:0;background:transparent;color:#d7dee7;text-align:left;padding:14px 13px;margin:3px 0;border-radius:10px;cursor:pointer;transition:.2s}
+.day-btn:hover{background:#263646}
+.day-btn.active{background:var(--blue);color:#fff;box-shadow:0 5px 15px #0003}
+.day-btn .d{font-weight:800;font-size:14px}
+.day-btn .s{font-size:11px;opacity:.82;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend{margin-top:auto;padding:15px 18px;color:#9aa7b5;font-size:11px;border-top:1px solid #344250}
+.legend div{margin:5px 0}
+
+/* 右側 */
+.main{flex:1;min-width:0;height:100vh;padding:14px;display:grid;grid-template-rows:170px minmax(0,1fr);gap:14px}
+
+/* 大綱 */
+.overview{background:var(--card);border-radius:16px;padding:18px 20px;box-shadow:0 4px 18px #1e293b12;overflow:hidden}
+.overview-head{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.overview h2{font-size:20px;margin:0}
+.pill{font-size:12px;background:var(--blue2);color:#1d4ed8;border-radius:999px;padding:6px 10px;white-space:nowrap}
+.overview-text{margin-top:12px;color:#475569;line-height:1.6;font-size:14px}
+.highlights{display:flex;gap:8px;overflow:auto;margin-top:10px}
+.tag{background:#f8fafc;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;white-space:nowrap}
+
+/* 詳細 */
+.detail{background:var(--card);border-radius:16px;box-shadow:0 4px 18px #1e293b12;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.detail-head{padding:15px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.detail-head h3{margin:0;font-size:17px}
+.detail-actions{display:flex;gap:7px}
+.action{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;color:#334155}
+.action:hover{background:#f8fafc}
+.detail-body{display:flex;min-height:0;flex:1}
+.timeline{overflow:auto;padding:20px 30px 35px;width:100%}
+.timeline-item{display:grid;grid-template-columns:120px 1fr;gap:18px;position:relative;padding-bottom:21px}
+.timeline-item:before{content:"";position:absolute;left:124px;top:25px;bottom:-1px;width:2px;background:#dbe5f0}
+.timeline-item:last-child:before{display:none}
+.time{font-size:12px;font-weight:800;color:#2563eb;background:#eff6ff;border:1px solid #dbeafe;border-radius:8px;padding:7px 8px;height:max-content;text-align:center}
+.event{position:relative;padding:1px 0 0 18px}
+.event:before{content:"";position:absolute;left:-3px;top:6px;width:10px;height:10px;background:#3b82f6;border:3px solid #dbeafe;border-radius:50%;z-index:2}
+.event-title{font-size:15px;font-weight:800;margin-bottom:6px}
+.event-desc{font-size:13px;color:#64748b;line-height:1.65;white-space:pre-line}
+.event-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.glink{display:inline-block;text-decoration:none;font-size:11px;border:1px solid #dbeafe;color:#1d4ed8;background:#eff6ff;padding:5px 8px;border-radius:7px}
+
+/* 手機 / iPad */
+@media(max-width:900px){
+ body{overflow:auto;display:block}
+ .sidebar{width:100%;height:auto}
+ .brand{padding:14px 16px}
+ .days{display:flex;overflow-x:auto;padding:8px}
+ .day-btn{min-width:145px}
+ .legend{display:none}
+ .main{height:auto;min-height:calc(100vh - 95px);grid-template-rows:auto auto;padding:10px}
+ .overview{min-height:145px}
+ .detail-body{display:flex}
+ .timeline{max-height:none}
+}
+@media(max-width:600px){
+ .main{grid-template-rows:auto auto}
+ .detail-body{display:flex;flex-direction:column}
+ .timeline-item{grid-template-columns:85px 1fr}
+ .timeline-item:before{left:89px}
+}
+</style>
+</head>
+
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <h1>🇯🇵 關西 6 日旅行</h1>
+    <p>2026 / 10 / 09 → 10 / 14</p>
+  </div>
+  <div class="days" id="dayButtons"></div>
+  <div class="legend">
+    <div>🔵 行程地點</div>
+    <div>📍 點地圖標記可看地點</div>
+    <div>🗺 每個地點都可直接開 Google Maps</div>
+  </div>
+</aside>
+
+<main class="main">
+  <section class="overview">
+    <div class="overview-head">
+      <h2 id="overviewTitle"></h2>
+      <span class="pill" id="overviewPill"></span>
+    </div>
+    <div class="overview-text" id="overviewText"></div>
+    <div class="highlights" id="highlights"></div>
+  </section>
+
+  <section class="detail">
+    <div class="detail-head">
+      <h3 id="detailTitle"></h3>
+      <div class="detail-actions">
+        <a class="action" id="googleAll" target="_blank" rel="noopener">📍 開啟本日 Google Maps</a>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const days = {
+1:{
+ date:"DAY 1 · 10/09 五", short:"KIX → 利木津公車 / 海上高速船 → 港塔",
+ title:"DAY 1｜關西機場 ➜ 海上高速船 / 利木津公車 ➜ 神戶三宮 ➜ 神戶港夜景",
+ pill:"抵達日",
+ overview:"關西機場降落後，提供「神戶海上高速船（Bay Shuttle）」體驗與「利木津巴士」兩種交通選擇進神戶三宮；下午在三宮逛街採買，晚上吃鯛魚拉麵並欣賞神戶港夜景。",
+ tags:["✈️ KIX","🛳️ 海上高速船","🚌 利木津巴士","🛍️ 三宮中心街","🍜 ○de▽","🗼 神戶港塔"],
+ points:[
+  ["KIX 關西國際機場",34.4347,135.2440],
+  ["神戶-關西機場海上高速船乘船處",34.4395,135.2340],
+  ["神戶三宮巴士站",34.6947,135.1942],
+  ["Royal Park Canvas 神戶三宮",34.6962,135.1918],
+  ["Isuzu Bakery 三宮本店",34.6941,135.1911],
+  ["鯛白湯らーめん ○de▽",34.7009,135.1948],
+  ["BE KOBE",34.6810,135.1868],
+  ["神戶港塔",34.6828,135.1869]
+ ],
+ items:[
+  ["13:55–15:00","🛬 關西機場 KIX｜降落＋提領行李＋出關","預留約 50–60 分鐘通關與領行李。"],
+  ["15:00–17:00","🛳️ 支線 A：神戶海上高速船（推薦）","【船班 16:00】於 1 樓 A 出口買票（外國人優惠 500 日圓），搭接駁車至碼頭。\n16:00 開船 ➔ 16:30 抵達神戶機場碼頭 ➔ 轉搭 Port Liner 捷運約 18 分鐘至三宮（約 17:00 抵達）。"],
+  ["15:00–17:00","🚌 支線 B：利木津機場公車（備選）","【公車 15:25】乘車處：1 樓 6 號月台。直達神戶三宮約 65 分鐘（約 16:30–16:50 抵達）。\n備用班次：15:10 / 15:40 / 15:55。"],
+  ["17:00–17:40","🏨 Royal Park Canvas 神戶三宮｜Check-in","辦理入住、放行李、稍作休息。"],
+  ["17:40–20:00","🛍️ 三宮中心街逛街＋採買早餐","🍞 Isuzu Bakery：鹽可頌、哈密瓜麵包。\n🍇 超市／成城石井：麝香葡萄＋鮮奶／優格。"],
+  ["20:00–21:00","🍜 鯛魚拉麵「○de▽」","品嚐鯛魚清湯／白湯拉麵與鯛魚薑飯。"],
+  ["21:00–22:30","🗼 神戶港塔＋BE KOBE 夜景","拍攝 BE KOBE 地標，登上神戶港塔展望台看夜景。"],
+  ["22:30 之後","🛌 返回飯店休息","把麝香葡萄與鮮奶放進房間冰箱，準備 DAY 2。"]
+ ]},
+2:{
+ date:"DAY 2 · 10/10 六", short:"姬路城 → 鰻魚午餐/白布丁/明石燒 → 北野異人館",
+ title:"DAY 2｜姬路城 ➜ 柊 星鰻 & 明石燒午餐 ➜ 神戶白布丁 ➜ 北野異人館",
+ pill:"古城＋神戶美食",
+ overview:"早上前往姬路城與好古園；午餐享用姬路著名的「柊」星鰻（穴子）料理，並在百貨／車站尋找明石燒與神戶白布丁！下午回神戶前往北野神社與異人館散步。",
+ tags:["🏯 姬路城","🍱 柊 星鰻","🍢 明石燒","🍮 白布丁","⛩️ 北野天滿神社","🏡 異人館"],
+ points:[
+  ["JR 三宮站",34.6940,135.1955],
+  ["JR 姬路站",34.8272,134.6900],
+  ["姬路城",34.8394,134.6939],
+  ["好古園",34.8385,134.6905],
+  ["穴子料理 柊",34.8320,134.6912],
+  ["北野天滿神社",34.7011,135.1871],
+  ["風見雞館",34.7005,135.1906],
+  ["Starbucks 北野物語館",34.6993,135.1886]
+ ],
+ items:[
+  ["08:30–09:00","🥐 房間早餐 ➜ JR 三宮站","享用前一天買好的 Isuzu Bakery 麵包與鮮奶。"],
+  ["09:15–09:55","🚆 JR 神戶線新快速｜三宮 ➜ 姬路","搭往姬路／網干方向的新快速，約 40 分鐘。"],
+  ["10:00–12:30","🏯 姬路城大天守閣＋好古園","姬路城＋好古園聯票；登大天守閣參觀。"],
+  ["12:30–14:30","🍱 午餐饗宴｜柊 星鰻 ➜ 明石燒 ➜ 買白布丁","1. 品嚐「柊」著名星鰻飯（穴子重／御膳）。\n2. 搭配在地熱騰騰的高湯明石燒。\n3. 百貨/車站甜點櫃購買神戶牛奶白布丁。"],
+  ["14:30–15:10","🚆 JR 新快速｜姬路 ➜ 三宮","約 40 分鐘返回 JR 三宮站。"],
+  ["15:20–15:40","🚌 City Loop｜三宮 ➜ 北野異人館","JR 三宮站前 7 號乘車處，搭至北野異人館。"],
+  ["15:40–16:30","⛩️ 北野天滿神社","參拜並領取御朱印，俯瞰神戶市區與港口景致。"],
+  ["16:30–17:30","🏡 風見雞館＋萌黃之館","順坡參觀異人館，可至星巴克北野物語館喝咖啡歇腳。"],
+  ["17:30–18:00","🛋️ 散步回飯店＋休息","沿北野坂下坡回 Royal Park Canvas 休息。"],
+  ["18:00–20:00","🍽️ 三宮輕鬆晚餐","享用輕食、燒肉或居酒屋，享受自在夜晚。"]
+ ]},
+3:{
+ date:"DAY 3 · 10/11 日", short:"有馬 → 六甲山 → 難波雲海",
+ title:"DAY 3｜有馬溫泉 ➜ 六甲山 ➜ 大阪難波 ➜ SUPER 雲海",
+ pill:"溫泉＋山景＋大阪",
+ overview:"退房寄放行李後，以 JR 有馬 Express 直達有馬溫泉；逛溫泉街、搭六甲有馬纜車上山，再回有馬取行李轉大阪，晚上卡 21:00 SUPER 雲海。",
+ tags:["🚌 有馬 Express","♨️ 有馬溫泉","缆車 六甲有馬纜車","☕ Granite Cafe","🌫️ SUPER 雲海"],
+ points:[
+  ["Royal Park Canvas 神戶三宮",34.6962,135.1918],
+  ["三宮巴士總站",34.6947,135.1942],
+  ["有馬溫泉",34.7970,135.2460],
+  ["金之湯",34.7978,135.2461],
+  ["六甲有馬纜車 有馬溫泉站",34.7988,135.2430],
+  ["六甲山頂站",34.7745,135.2554],
+  ["六甲花園露台",34.7630,135.2490],
+  ["六甲枝垂れ",34.7638,135.2482],
+  ["Granite Cafe",34.7632,135.2475],
+  ["Dormy Inn PREMIUM Namba",34.6657,135.5056],
+  ["EDION 難波本店",34.6647,135.5015],
+  ["NAMBA PARKS",34.6619,135.5015]
+ ],
+ items:[
+  ["08:30–09:15","🧳 退房＋寄放行李＋前往三宮巴士站","Royal Park Canvas Check-out；行李寄放飯店。"],
+  ["09:50–10:20","🚌 JR 有馬エクスプレス 3號｜三宮 ➜ 有馬","鎖定 09:50 班次，直達約 30 分鐘。"],
+  ["10:20–13:00","♨️️ 有馬溫泉老街＋金湯足湯＋午餐","碳酸煎餅、牛肉可樂餅；午餐享用蕎麥麵或釜飯。"],
+  ["13:00–13:20","🚠 六甲有馬纜車｜有馬 ➜ 六甲山","搭乘纜車上山，單程約 12 分鐘。"],
+  ["13:20–15:30","🌲 六甲花園露台＋六甲枝垂れ＋Granite Cafe","俯瞰神戶港與大阪灣景致，在 Granite Cafe 享受下午茶。"],
+  ["15:30–16:45","🚠 下山回有馬＋自由時間","採買伴手禮，溫泉街自由散策。"],
+  ["16:55–17:30","🚌 JR 有馬エクスプレス 20號｜有馬 ➜ 三宮","鎖定 16:55 → 17:30 返回三宮。"],
+  ["17:30–18:55","🧳 取行李 ➜ 阪神難波線 ➜ 大阪難波","取回行李，搭車前往大阪難波。"],
+  ["19:00–20:50","🏨 Dormy Inn Check-in ➜ 🍢 大阪小吃 ➜ 🛍️️ EDION","辦理入住，小吃填飽肚子後逛 EDION 家電與周邊。"],
+  ["21:00–21:20","🌫️ NAMBA PARKS｜SUPER 雲海","準時觀賞 21:00 限定 SUPER 雲海演出。"],
+  ["21:40–22:30","🏨 飯店休息","回飯店整理戰利品並稍作休息。"],
+  ["22:30–23:00","🍜 夜鳴そば ➜ ♨️ 大浴場","享用 Dormy Inn 免費夜鳴拉麵，泡湯放鬆。"]
+ ]},
+4:{
+ date:"DAY 4 · 10/12 一", short:"黑門 → 住吉 → 新世界 → 梅田",
+ title:"DAY 4｜黑門市場 ➜ 住吉大社 ➜ 新世界 ➜ 梅田爆買",
+ pill:"大阪購物日",
+ overview:"早上黑門市場吃早餐，接著住吉大社與阪堺電車，再到新世界午餐；下午回飯店卸貨休息，傍晚進梅田集中購物。",
+ tags:["🦪 黑門市場","⛩️️ 住吉大社","🚋 阪堺電車","🗼 通天閣","👟 Alpen","🎮 Nintendo / Pokémon"],
+ points:[
+  ["黑門市場",34.6658,135.5066],
+  ["南海難波站",34.6659,135.4993],
+  ["住吉大社",34.6128,135.4930],
+  ["住吉鳥居前站",34.6125,135.4920],
+  ["惠美須町站",34.6528,135.5050],
+  ["通天閣",34.6526,135.5063],
+  ["Dormy Inn PREMIUM Namba",34.6657,135.5056],
+  ["Alpen Namba / 梅田區域",34.7035,135.4972],
+  ["大丸梅田店",34.7020,135.4959],
+  ["Nintendo OSAKA",34.7020,135.4959],
+  ["Pokémon Center OSAKA",34.7020,135.4959],
+  ["LUCUA Osaka",34.7023,135.4962]
+ ],
+ items:[
+  ["08:30–10:00","🦪 黑門市場早餐美食巡禮","現烤干貝、和牛串燒、刺身與海鮮丼。"],
+  ["10:00–10:30","🚃 南海電鐵｜難波 ➜ 住吉大社","搭乘南海電鐵至住吉大社站。"],
+  ["10:30–12:00","⛩️ 住吉大社","跨越太鼓橋、尋找五大力神石，體驗懷舊神社氛圍。"],
+  ["12:00–12:30","🚋 阪堺電車｜住吉鳥居前 ➜ 惠美須町","體驗大阪唯一的百年路面電車。"],
+  ["12:30–14:30","🗼 通天閣＋新世界午餐","享用元祖串炸與土手燒。"],
+  ["14:30–15:30","🛋️ 回 Dormy Inn 放東西＋歇腳","將戰利品放回房間，稍微休息補足體力。"],
+  ["15:30–16:00","🚇 御堂筋線｜難波 ➜ 梅田","搭乘地鐵直達梅田購物區。"],
+  ["16:00–20:00","🛍️ 梅田爆買主時段","👟 Alpen 運動用品；🎮 大丸梅田 13F Nintendo OSAKA ＋ Pokémon Center。"],
+  ["20:00–21:30","🍽️ 梅田晚餐","享用燒肉或美味牛舌。"],
+  ["21:30 之後","🍜 回 Dormy Inn｜夜鳴そば＋大浴場","返回飯店，享用拉麵與泡湯收尾。"]
+ ]},
+5:{
+ date:"DAY 5 · 10/13 二", short:"USJ 全日＋13:45 遊行 ＋ 20:00 任天堂",
+ title:"DAY 5｜Universal Studios Japan 🎃",
+ pill:"USJ 萬聖節主戰日",
+ overview:"全天投入 USJ！早上搶 Frieren 周邊與熱門設施，午後 13:00 提前卡位觀賞 13:45 萬聖節大遊行，晚上鎖定 20:00 Super Nintendo World 與 Bowser Challenge！",
+ tags:["🎢 USJ","🏹 Frieren 周邊","🎃 13:45 遊行卡位","🧙 Harry Potter","🦈 JAWS","🍄 任天堂 20:00"],
+ points:[
+  ["Dormy Inn PREMIUM Namba",34.6657,135.5056],
+  ["Universal Studios Japan",34.6656,135.4323],
+  ["Super Nintendo World",34.6667,135.4297],
+  ["The Wizarding World of Harry Potter",34.6670,135.4290],
+  ["Minion Park",34.6660,135.4320],
+  ["JAWS",34.6665,135.4310]
+ ],
+ items:[
+  ["早上","🚆 難波 ➜ USJ｜提早抵達準備入園","提前前往 USJ，留足入園安檢時間。"],
+  ["入園後","🏹 葬送的芙莉蓮 Frieren 周邊優先","先衝周邊商店搶購，避免完售。"],
+  ["上午","🧙 Harry Potter ➜ 🍌 小小兵 ➜ 🦈 巨鯊 JAWS","穿插暢玩熱門主題園區與設施。"],
+  ["13:00–13:45","🎪 13:45 NO LIMIT! 萬聖節遊行 提前卡位 🔥","建議 13:00–13:15 提前至遊行路線（如好萊塢區主幹道）佔地墊卡第一排最佳視野！"],
+  ["13:45–14:30","🎉 NO LIMIT! 萬聖節狂歡遊行","感受歡樂的萬聖節派對表演與狂歡氛圍。"],
+  ["下午","🎃 萬聖節限定活動 & 園區拍照","體驗萬聖節期間限定設施與主題美食。"],
+  ["19:30 前","🍄 前往 Super Nintendo World 周邊","提前向超級任天堂世界入口移動。"],
+  ["20:00–20:30","🏹 Bowser Challenge 庫巴挑戰賽","指定預約時段，準時體驗！"],
+  ["20:00–21:00","🍄 Super Nintendo World 暢玩","享受夜晚燈光閃爍的瑪利歐園區。"],
+  ["21:00 之後","🎁 USJ 最後補貨 ➜ 返回難波","最後採購紀念品，搭車返回難波休息。"]
+ ]},
+6:{
+ date:"DAY 6 · 10/14 三", short:"難波最後補貨 → KIX",
+ title:"DAY 6｜難波最後巡禮 ➜ 關西機場 ✈️",
+ pill:"回程日",
+ overview:"最後一天以低風險為主：飯店周邊最後補貨、整理行李，再前往關西機場。",
+ tags:["🛍️ 最後補貨","🧳 整理行李","🚆 南海電鐵","✈️ KIX"],
+ points:[
+  ["Dormy Inn PREMIUM Namba",34.6657,135.5056],
+  ["心齋橋筋商店街",34.6729,135.5012],
+  ["南海難波站",34.6659,135.4993],
+  ["關西國際機場 T1",34.4347,135.2440]
+ ],
+ items:[
+  ["上午","🛍️ 難波／心齋橋最後巡禮","於飯店周邊補齊伴手禮、藥妝與生活小物。"],
+  ["出發前","🧳 回飯店整理行李＋Check-out","打包戰利品，準備前往機場。"],
+  ["前往機場","🚆 南海難波 ➜ 關西機場","搭乘 Rapi:t 或特急電車至 KIX，預留報到安檢時間。"],
+  ["抵達 KIX","✈️ 關西機場 T1｜登機返家","順利辦理登機，結束美好的關西之旅！"]
+ ]}
+};
+
+let currentDay=1;
+function googleSearch(name){
+ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(name);
+}
+function googleDay(points){
+ if(points.length===0)return "#";
+ const origin=points[0][0];
+ const destination=points[points.length-1][0];
+ const waypoints=points.slice(1,-1).map(p=>p[0]).join("|");
+ let url="https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(origin)+"&destination="+encodeURIComponent(destination);
+ if(waypoints)url+="&waypoints="+encodeURIComponent(waypoints);
+ return url;
+}
+function renderDay(n){
+ currentDay=n;
+ const d=days[n];
+ document.querySelectorAll(".day-btn").forEach((b,i)=>b.classList.toggle("active",i+1===n));
+ document.getElementById("overviewTitle").textContent=d.title;
+ document.getElementById("overviewPill").textContent=d.pill;
+ document.getElementById("overviewText").textContent=d.overview;
+ document.getElementById("highlights").innerHTML=d.tags.map(x=>`<span class="tag">${x}</span>`).join("");
+ document.getElementById("detailTitle").textContent=d.title;
+ const tl=document.getElementById("timeline");
+ tl.innerHTML="";
+ d.items.forEach((it,i)=>{
+   const related=d.points[Math.min(i,d.points.length-1)];
+   const name=related?related[0]:"";
+   const el=document.createElement("div");
+   el.className="timeline-item";
+   el.innerHTML=`
+     <div class="time">${it[0]}</div>
+     <div class="event">
+       <div class="event-title">${it[1]}</div>
+       <div class="event-desc">${it[2]}</div>
+       ${name?`<div class="event-links"><a class="glink" target="_blank" rel="noopener" href="${googleSearch(name)}">📍 ${name}｜Google Maps</a></div>`:""}
+     </div>`;
+   tl.appendChild(el);
+ });
+ const all=googleDay(d.points);
+ document.getElementById("googleAll").href=all;
+}
+function buildButtons(){
+ const box=document.getElementById("dayButtons");
+ Object.entries(days).forEach(([n,d])=>{
+   const b=document.createElement("button");
+   b.className="day-btn";
+   b.innerHTML=`<div class="d">${d.date}</div><div class="s">${d.short}</div>`;
+   b.onclick=()=>renderDay(Number(n));
+   box.appendChild(b);
+ });
+}
+buildButtons();
+renderDay(1);
+</script>
+</body>
+</html>
